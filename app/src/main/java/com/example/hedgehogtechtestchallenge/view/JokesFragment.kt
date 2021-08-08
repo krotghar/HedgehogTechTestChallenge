@@ -6,25 +6,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hedgehogtechtestchallenge.R
-import com.example.hedgehogtechtestchallenge.data.Joke
 import com.example.hedgehogtechtestchallenge.view.utils.JokesRecyclerAdapter
-import com.example.hedgehogtechtestchallenge.viewmodel.JokesResult
+import com.example.hedgehogtechtestchallenge.view.utils.RecyclerViewMargin
 import com.example.hedgehogtechtestchallenge.viewmodel.JokesViewModel
-import com.example.hedgehogtechtestchallenge.viewmodel.ValidResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import okhttp3.internal.immutableListOf
 
 class JokesFragment : Fragment() {
 
@@ -48,11 +42,12 @@ class JokesFragment : Fragment() {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = JokesRecyclerAdapter(arrayListOf())
+        adapter = JokesRecyclerAdapter()
         val list: RecyclerView = view.findViewById(R.id.joke_rv)
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         val editText: EditText = view.findViewById(R.id.joke_counter)
         val btn: Button = view.findViewById(R.id.button)
+
         btn.setOnClickListener {
             if (editText.text.isNotEmpty()) {
                 Log.d(JokesFragment::class.java.simpleName, "${editText.text.toString().toInt()}")
@@ -61,8 +56,8 @@ class JokesFragment : Fragment() {
                 Toast.makeText(context, "Enter count", Toast.LENGTH_SHORT).show()
             }
         }
-        viewModel.jokes.observe(viewLifecycleOwner, { jokes -> adapter.update(jokes) })
-        val itemDecoration = DividerItemDecoration(context, layoutManager.orientation)
+        viewModel.jokes.observe(viewLifecycleOwner, { jokes -> adapter.submitList(jokes) })
+        val itemDecoration = RecyclerViewMargin(requireActivity().resources.getDimension(R.dimen.recycler).toInt())
         list.layoutManager = layoutManager
         list.addItemDecoration(itemDecoration)
         list.adapter = adapter
