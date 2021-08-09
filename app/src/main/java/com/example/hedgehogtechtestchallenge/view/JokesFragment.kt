@@ -7,9 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,11 +21,13 @@ import kotlinx.coroutines.FlowPreview
 
 class JokesFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = JokesFragment()
-    }
-
+    private lateinit var itemDecoration: RecyclerViewMargin
+    private lateinit var btn: Button
+    private lateinit var editText: TextView
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var list: RecyclerView
     private lateinit var adapter: JokesRecyclerAdapter
+
     private val viewModel: JokesViewModel by viewModels()
 
 
@@ -42,11 +43,7 @@ class JokesFragment : Fragment() {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = JokesRecyclerAdapter()
-        val list: RecyclerView = view.findViewById(R.id.joke_rv)
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val editText: EditText = view.findViewById(R.id.joke_counter)
-        val btn: Button = view.findViewById(R.id.button)
+        initViewResource(view)
 
         btn.setOnClickListener {
             if (editText.text.isNotEmpty()) {
@@ -56,16 +53,22 @@ class JokesFragment : Fragment() {
                 Toast.makeText(context, "Enter count", Toast.LENGTH_SHORT).show()
             }
         }
+
         viewModel.jokes.observe(viewLifecycleOwner, { jokes -> adapter.submitList(jokes) })
-        val itemDecoration = RecyclerViewMargin(requireActivity().resources.getDimension(R.dimen.recycler).toInt())
+    }
+
+    private fun initViewResource(view: View) {
+        adapter = JokesRecyclerAdapter()
+        list = view.findViewById(R.id.joke_rv)
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        editText = view.findViewById(R.id.joke_counter)
+        btn = view.findViewById(R.id.button)
+        itemDecoration =
+            RecyclerViewMargin(requireActivity().resources.getDimension(R.dimen.recycler).toInt())
         list.layoutManager = layoutManager
         list.addItemDecoration(itemDecoration)
         list.adapter = adapter
-
     }
-
-
-
 
 
 }
