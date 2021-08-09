@@ -70,7 +70,7 @@ class JokesFragment : Fragment() {
             }
         })
         viewModel.loadError.observe(viewLifecycleOwner, { errorMsg ->
-            Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+            if (errorMsg != null) Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
         })
     }
 
@@ -86,6 +86,11 @@ class JokesFragment : Fragment() {
         list.layoutManager = layoutManager
         list.addItemDecoration(itemDecoration)
         list.adapter = adapter
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        viewModel.loadError.value = null
     }
 
 
