@@ -30,14 +30,18 @@ class MainFragment : Fragment() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        demoCollectionAdapter = TabCollectionAdapter(this)
-        viewPager = view.findViewById(R.id.view_pager)
-        viewPager.adapter = demoCollectionAdapter
-        tabLayout = view.findViewById(R.id.tabLayout)
+        initViewResource(view)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = tabText[position]
             tab.icon = resources.getDrawable(tabIcon[position], requireActivity().application.theme)
         }.attach()
+    }
+
+    private fun initViewResource(view: View) {
+        demoCollectionAdapter = TabCollectionAdapter(this)
+        viewPager = view.findViewById(R.id.view_pager)
+        viewPager.adapter = demoCollectionAdapter
+        tabLayout = view.findViewById(R.id.tabLayout)
     }
 
 
