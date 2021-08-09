@@ -11,12 +11,12 @@ class JokesViewModel : ViewModel() {
     private val jokeService = JokeService().getJokeService()
     private var job: Job? = null
     private val exceptionHandler = CoroutineExceptionHandler{ _, throwable ->
-        ErrorResult("ExceptionHandled: ${throwable.localizedMessage}")
+        onError("No internet connection")
     }
     private  val jokeCount = MutableLiveData<Int>()
     val jokes = MutableLiveData<List<Joke>>()
-    private val loadError = MutableLiveData<String?>()
-    private val loading = MutableLiveData<Boolean>()
+    val loadError = MutableLiveData<String?>()
+    val loading = MutableLiveData<Boolean>()
 
     fun refresh(number: Int) {
         jokeCount.value = number
@@ -43,8 +43,8 @@ class JokesViewModel : ViewModel() {
     }
 
     private fun onError(string: String) {
-        loadError.value = string
-        loading.value = false
+        loadError.postValue(string)
+        loading.postValue(false)
     }
 
     override fun onCleared() {

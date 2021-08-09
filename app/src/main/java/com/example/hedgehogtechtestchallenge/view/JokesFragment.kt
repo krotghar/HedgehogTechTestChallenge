@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
@@ -16,8 +17,7 @@ import com.example.hedgehogtechtestchallenge.R
 import com.example.hedgehogtechtestchallenge.view.utils.JokesRecyclerAdapter
 import com.example.hedgehogtechtestchallenge.view.utils.RecyclerViewMargin
 import com.example.hedgehogtechtestchallenge.viewmodel.JokesViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+
 
 class JokesFragment : Fragment() {
 
@@ -27,6 +27,7 @@ class JokesFragment : Fragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var list: RecyclerView
     private lateinit var adapter: JokesRecyclerAdapter
+    private lateinit var progressBar: ProgressBar
 
     private val viewModel: JokesViewModel by viewModels()
 
@@ -39,12 +40,14 @@ class JokesFragment : Fragment() {
 
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewResource(view)
+        btnSetOnClickListener()
+        observeViewModel()
+    }
 
+    private fun btnSetOnClickListener() {
         btn.setOnClickListener {
             if (editText.text.isNotEmpty()) {
                 Log.d(JokesFragment::class.java.simpleName, "${editText.text.toString().toInt()}")
@@ -53,8 +56,22 @@ class JokesFragment : Fragment() {
                 Toast.makeText(context, "Enter count", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
+    private fun observeViewModel() {
         viewModel.jokes.observe(viewLifecycleOwner, { jokes -> adapter.submitList(jokes) })
+        viewModel.loading.observe(viewLifecycleOwner, { loadingState ->
+            if (loadingState) {
+                btn.visibility = Button.INVISIBLE
+                progressBar.visibility = ProgressBar.VISIBLE
+            } else {
+                btn.visibility = Button.VISIBLE
+                progressBar.visibility = ProgressBar.INVISIBLE
+            }
+        })
+        viewModel.loadError.observe(viewLifecycleOwner, { errorMsg ->
+            Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+        })
     }
 
     private fun initViewResource(view: View) {
@@ -63,6 +80,7 @@ class JokesFragment : Fragment() {
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         editText = view.findViewById(R.id.joke_counter)
         btn = view.findViewById(R.id.button)
+        progressBar = view.findViewById(R.id.progress_bar)
         itemDecoration =
             RecyclerViewMargin(requireActivity().resources.getDimension(R.dimen.recycler).toInt())
         list.layoutManager = layoutManager
