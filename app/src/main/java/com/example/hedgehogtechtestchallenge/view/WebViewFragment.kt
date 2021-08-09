@@ -12,15 +12,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
 import com.example.hedgehogtechtestchallenge.R
-import androidx.appcompat.widget.Toolbar
 
 class WebViewFragment : Fragment() {
     private lateinit var webView: WebView
-
-    companion object {
-        fun newInstance() = WebViewFragment()
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,20 +25,17 @@ class WebViewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        webView = view.findViewById(R.id.web_view)
-        webView.webViewClient = MyWebViewClient()
+        initViewResource(view)
+        checkSavedState(savedInstanceState)
+        backPressedListener()
+    }
 
-        if (savedInstanceState != null) {
-            webView.restoreState(savedInstanceState.getBundle("webView")!!)
-        } else {
-            webView.loadUrl("https://www.icndb.com/api/")
-        }
-
+    private fun backPressedListener() {
         requireActivity()
             .onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if(webView.canGoBack()) {
+                    if (webView.canGoBack()) {
                         isEnabled = false
                         webView.goBack()
                     } else {
@@ -56,7 +47,19 @@ class WebViewFragment : Fragment() {
                     }
                 }
             })
+    }
 
+    private fun checkSavedState(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            webView.restoreState(savedInstanceState.getBundle("webView")!!)
+        } else {
+            webView.loadUrl("https://www.icndb.com/api/")
+        }
+    }
+
+    private fun initViewResource(view: View) {
+        webView = view.findViewById(R.id.web_view)
+        webView.webViewClient = MyWebViewClient()
     }
 
 
